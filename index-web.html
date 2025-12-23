@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚾ Baseball Draft Tracker - Web Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .data-display {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .instructions code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .connection-status {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .web-url {
+            background: #e3f2fd;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚾ Baseball Draft Tracker</h1>
+            <div class="subtitle">Web Dashboard - Real-Time Collaboration</div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-icon">👥</div>
+                <div class="card-title">Live Draft Board</div>
+                <div class="data-display" id="draftBoard">
+                    <div class="connection-status" id="connectionStatus">
+                        <div class="disconnected">Connecting...</div>
+                    </div>
+                    <div id="playerList"></div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">👤</div>
+                <div class="card-title">Add Player</div>
+                <div class="input-group">
+                    <label for="playerName">Player Name</label>
+                    <input type="text" id="playerName" placeholder="e.g., Mike Trout">
+                </div>
+                <div class="input-group">
+                    <label for="playerPosition">Position</label>
+                    <input type="text" id="playerPosition" placeholder="e.g., OF, SP, 1B">
+                </div>
+                <div class="input-group">
+                    <label for="playerTeam">MLB Team</label>
+                    <input type="text" id="playerTeam" placeholder="e.g., Yankees, Dodgers">
+                </div>
+                <div class="input-group">
+                    <label for="fantasyOwner">Fantasy Owner</label>
+                    <input type="text" id="fantasyOwner" placeholder="e.g., Team Smith, Mets">
+                </div>
+                <button class="btn btn-primary" onclick="addPlayer()">Add Player</button>
+                <button class="btn btn-secondary" onclick="draftPlayer()">Draft Player</button>
+            </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Data Management</div>
+                <div class="input-group">
+                    <label for="importData">Import Data (JSON)</label>
+                    <textarea id="importData" placeholder="Paste your draft data here..." rows="6"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="importData()">Import Data</button>
+                <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                <button class="btn btn-secondary" onclick="clearData()">Clear All Data</button>
+                <button class="btn btn-secondary" onclick="syncToLocal()">Sync to Local</button>
+            </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🚀 How to Use</h3>
+            <p><strong>Step 1:</strong> Open your local draft tracker (index.html) to start drafting players</p>
+            <p><strong>Step 2:</strong> Changes made in either location will sync automatically</p>
+            <p><strong>Step 3:</strong> Keep both tabs open for real-time collaboration</p>
+            <p><strong>Pro Tip:</strong> Use the web dashboard for quick team management and data import/export!</p>
+        </div>
+
+        <div class="connection-status" id="userStatus">
+            <div class="user-id" id="currentUserId">Identifying user...</div>
+        </div>
+
+        <div class="web-url">
+            <strong>Share this URL:</strong><br>
+            <code id="shareUrl">Generating...</code>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const WEB_VERSION = true;
+        const SYNC_INTERVAL = 5000; // 5 seconds for web version
+        const STORAGE_KEY = 'baseballDraftTracker';
+        
+        let currentUserId = '';
+        let players = [];
+        let isConnected = false;
+        let connectionRetry = 0;
+        let lastSyncTime = 0;
+
+        // Initialize
+        function initialize() {
+            identifyUser();
+            loadLocalData();
+            startSyncing();
+            updateConnectionStatus();
+            updateShareUrl();
+        }
+
+        // User identification
+        function identifyUser() {
+            const savedUser = localStorage.getItem('webUserId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlUser = urlParams.get('user');
+            
+            if (urlUser) {
+                currentUserId = urlUser;
+                localStorage.setItem('webUserId', currentUserId);
+            } else if (savedUser) {
+                currentUserId = savedUser;
+            } else {
+                // Generate unique user ID
+                currentUserId = 'WebUser_' + Date.now();
+                localStorage.setItem('webUserId', currentUserId);
+            }
+            
+            document.getElementById('currentUserId').textContent = currentUserId;
+        }
+
+        // Local data management
+        function loadLocalData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    players = data.players || [];
+                }
+            } catch (e) {
+                console.error('Error loading local data:', e);
+                players = [];
+            }
+        }
+
+        function saveLocalData() {
+            const data = {
+                players: players,
+                lastUpdated: new Date().toISOString(),
+                webSync: true
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // Syncing functionality
+        function startSyncing() {
+            // Check if we can connect to other users
+            checkConnection();
+            
+            // Listen for storage events from other tabs
+            window.addEventListener('storage', handleStorageChange);
+            
+            // Initial sync
+            setTimeout(syncFromLocal, 1000);
+            
+            // Regular sync interval
+            setInterval(checkConnection, SYNC_INTERVAL);
+            setInterval(() => {
+                if (isConnected) {
+                    syncFromLocal();
+                }
+            }, SYNC_INTERVAL);
+        }
+
+        function handleStorageChange(e) {
+            if (e.key === STORAGE_KEY) {
+                setTimeout(() => {
+                    loadLocalData();
+                    updateDraftBoard();
+                    syncFromLocal();
+                }, 100);
+            }
+        }
+
+        function checkConnection() {
+            // Simple connection check - try to detect other tabs
+            const testKey = 'connection_test_' + Date.now();
+            localStorage.setItem(testKey, currentUserId);
+            
+            setTimeout(() => {
+                const stored = localStorage.getItem(testKey);
+                if (stored && stored !== currentUserId) {
+                    isConnected = true;
+                }
+                localStorage.removeItem(testKey);
+                updateConnectionStatus();
+            }, 100);
+        }
+
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            const userStatusElement = document.getElementById('userStatus');
+            
+            if (isConnected) {
+                statusElement.innerHTML = '<div class="connected">✅ Connected - Live Sync Active</div>';
+                userStatusElement.innerHTML = '<div class="user-id">🟢 User: ' + currentUserId + '</div>';
+            } else {
+                connectionRetry++;
+                if (connectionRetry > 3) {
+                    statusElement.innerHTML = '<div class="disconnected">⚠️ Limited Mode - Open local tracker for full features</div>';
+                    userStatusElement.innerHTML = '<div class="user-id">🔴 User: ' + currentUserId + ' (Limited)</div>';
+                } else {
+                    statusElement.innerHTML = '<div class="disconnected">🔄 Trying to connect...</div>';
+                    userStatusElement.innerHTML = '<div class="user-id">🟡 User: ' + currentUserId + ' (Connecting...)</div>';
+                }
+            }
+        }
+
+        // Sync functions
+        function syncFromLocal() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    players = data.players || [];
+                    updateDraftBoard();
+                    lastSyncTime = Date.now();
+                }
+            } catch (e) {
+                console.error('Sync error:', e);
+            }
+        }
+
+        function syncToWeb() {
+            saveLocalData();
+            setTimeout(syncFromLocal, 500);
+        }
+
+        // UI Functions
+        function updateDraftBoard() {
+            const playerList = document.getElementById('playerList');
+            const drafted = players.filter(p => p.drafted);
+            const available = players.filter(p => !p.drafted);
+            
+            let html = '';
+            
+            if (drafted.length > 0) {
+                html += '<h4 style="color: #2c3e50; margin: 15px 0;">📋 Drafted Players</h4>';
+                drafted.forEach(player => {
+                    html += `
+                        <div style="background: #e8f5e8; color: white; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                            <strong>${player.name}</strong> - ${player.fantasyOwner}
+                        </div>
+                    `;
+                });
+            }
+            
+            if (available.length > 0) {
+                html += '<h4 style="color: #27ae60; margin: 15px 0;">🆓 Available Players</h4>';
+                available.forEach(player => {
+                    html += `
+                        <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                            <strong>${player.name}</strong> - ${player.position || 'N/A'} - ${player.mlbTeam || 'N/A'}
+                        </div>
+                    `;
+                });
+            }
+            
+            playerList.innerHTML = html || '<p style="text-align: center; color: #666; padding: 20px;">No players yet. Add some players to get started!</p>';
+        }
+
+        // Player management
+        function addPlayer() {
+            const name = document.getElementById('playerName').value.trim();
+            const position = document.getElementById('playerPosition').value.trim();
+            const team = document.getElementById('playerTeam').value.trim();
+            const owner = document.getElementById('fantasyOwner').value.trim();
+            
+            if (!name) {
+                alert('Please enter a player name');
+                return;
+            }
+            
+            const player = {
+                id: Date.now().toString(),
+                name: name,
+                position: position,
+                mlbTeam: team,
+                fantasyOwner: owner || '',
+                drafted: owner ? true : false,
+                draftNotes: owner ? `Drafted by ${owner}` : '',
+                addedDate: new Date().toISOString()
+            };
+            
+            players.push(player);
+            saveLocalData();
+            syncToWeb();
+            
+            // Clear form
+            document.getElementById('playerName').value = '';
+            document.getElementById('playerPosition').value = '';
+            document.getElementById('playerTeam').value = '';
+            document.getElementById('fantasyOwner').value = '';
+        }
+
+        function draftPlayer() {
+            const name = document.getElementById('playerName').value.trim();
+            const owner = document.getElementById('fantasyOwner').value.trim();
+            
+            if (!name || !owner) {
+                alert('Please enter both player name and fantasy owner');
+                return;
+            }
+            
+            const playerIndex = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+            if (playerIndex !== -1) {
+                players[playerIndex].fantasyOwner = owner;
+                players[playerIndex].drafted = true;
+                players[playerIndex].draftNotes = `Drafted by ${owner}`;
+                players[playerIndex].draftedDate = new Date().toISOString();
+                
+                saveLocalData();
+                syncToWeb();
+                
+                // Clear form
+                document.getElementById('playerName').value = '';
+                document.getElementById('fantasyOwner').value = '';
+            } else {
+                alert('Player not found: ' + name);
+            }
+        }
+
+        // Data management
+        function importData() {
+            try {
+                const dataText = document.getElementById('importData').value.trim();
+                if (!dataText) {
+                    alert('Please paste JSON data to import');
+                    return;
+                }
+                
+                const importedPlayers = JSON.parse(dataText);
+                if (Array.isArray(importedPlayers)) {
+                    players = importedPlayers;
+                    saveLocalData();
+                    syncToWeb();
+                    document.getElementById('importData').value = '';
+                    alert('Successfully imported ' + importedPlayers.length + ' players!');
+                } else {
+                    alert('Invalid JSON data. Please ensure it\'s an array of player objects.');
+                }
+            } catch (e) {
+                alert('Error importing data: ' + e.message);
+            }
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(players, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `baseball-draft-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to clear ALL player data? This cannot be undone.')) {
+                players = [];
+                saveLocalData();
+                syncToWeb();
+                updateDraftBoard();
+            }
+        }
+
+        function updateShareUrl() {
+            const url = window.location.origin + window.location.pathname + '?user=' + currentUserId;
+            document.getElementById('shareUrl').textContent = url;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
