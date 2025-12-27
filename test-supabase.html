@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Test</title>
+</head>
+<body>
+    <h1>Supabase Test</h1>
+    <button onclick="testSupabase()">Load Players from Supabase</button>
+    <div id="results"></div>
+
+    <script src="config/env.local.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        async function testSupabase() {
+            const results = document.getElementById('results');
+            
+            try {
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_CONFIG.url,
+                    window.SUPABASE_CONFIG.anonKey
+                );
+
+                results.innerHTML = '<p>Loading data from Supabase...</p>';
+
+                const { data, error } = await supabase
+                    .from('players')
+                    .select('*')
+                    .limit(5); // Just get first 5 for testing
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data && data.length > 0) {
+                    let html = '<h3>Sample Players from Supabase:</h3>';
+                    data.forEach(player => {
+                        html += `<div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                            <strong>Name:</strong> ${player.name || 'N/A'}<br>
+                            <strong>Position:</strong> ${player.position || 'N/A'}<br>
+                            <strong>MLB Team:</strong> ${player.mlb_team || 'N/A'}<br>
+                            <strong>Notes:</strong> ${player.notes || 'N/A'}<br>
+                            <strong>Fantasy Owner:</strong> ${player.fantasy_owner || 'N/A'}<br>
+                            <strong>Full Object:</strong> <pre>${JSON.stringify(player, null, 2)}</pre>
+                        </div>`;
+                    });
+                    results.innerHTML = html;
+                } else {
+                    results.innerHTML = '<p>No players found in Supabase</p>';
+                }
+            } catch (error) {
+                results.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error('Supabase error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynasty Baseball Draft Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dynasty Baseball Draft Tracker</h1>
+            <div class="controls">
+                <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
+                <button id="clearAllBtn" class="btn btn-danger">Clear All Data</button>
+                <div class="edit-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="editModeToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span for="editModeToggle">Edit Mode</span>
+                </div>
+                <div class="sync-controls">
+                    <button id="loadFromSupabaseBtn" class="btn btn-secondary">Load from Supabase</button>
+                    <button id="backupToSupabaseBtn" class="btn btn-secondary">Backup to Supabase</button>
+                    <span id="syncStatus" class="sync-status"></span>
+                </div>
+                <div class="view-controls">
+                    <label for="viewSelect">View:</label>
+                    <select id="viewSelect">
+                        <option value="all">All Players</option>
+                        <option value="available">Available Only</option>
+                        <option value="drafted">Drafted Only</option>
+                        <option value="starred">Starred Players</option>
+                        <option value="by-owner">By Owner</option>
+                        <option value="rankings">Rankings</option>
+                    </select>
+                </div>
+                <div class="owner-filter" id="ownerFilter" style="display: none;">
+                    <label for="ownerSelect">Owner:</label>
+                    <select id="ownerSelect">
+                        <option value="">All Owners</option>
+                    </select>
+                </div>
+                <div class="position-filter" id="positionFilter">
+                    <label for="positionSelect">Position:</label>
+                    <select id="positionSelect">
+                        <option value="">All Positions</option>
+                        <option value="C">C - Catchers</option>
+                        <option value="1B">1B - First Base</option>
+                        <option value="2B">2B - Second Base</option>
+                        <option value="3B">3B - Third Base</option>
+                        <option value="SS">SS - Shortstop</option>
+                        <option value="OF">OF - Outfield</option>
+                        <option value="DH">DH - Designated Hitter</option>
+                        <option value="UTIL">UTIL - Utility</option>
+                        <option value="SP">SP - Starting Pitcher</option>
+                        <option value="RP">RP - Relief Pitcher</option>
+                        <option value="CL">CL - Closer</option>
+                        <option value="P">P - All Pitchers</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search players by name, team, or notes...">
+        </div>
+
+        <div class="table-controls">
+            <button id="sortByName" class="btn btn-secondary">Sort by Name</button>
+            <button id="sortByTeam" class="btn btn-secondary">Sort by Team</button>
+            <button id="sortByPosition" class="btn btn-secondary">Sort by Position</button>
+        </div>
+
+        <main>
+            <div class="table-container">
+                <table id="playersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>MLB Team</th>
+                            <th>Fantasy Owner</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playersTableBody">
+                        <!-- Players will be populated here -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <p>No players found. Add your first player to get started!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Player Modal -->
+    <div id="addPlayerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Player</h2>
+            <form id="addPlayerForm">
+                <div class="form-group">
+                    <label for="playerName">Name *</label>
+                    <input type="text" id="playerName" name="playerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="playerPosition">Position</label>
+                    <input type="text" id="playerPosition" name="playerPosition" placeholder="e.g., C, 1B, 2B, SS, 3B, OF, SP, RP">
+                </div>
+                <div class="form-group">
+                    <label for="playerMlbTeam">MLB Team</label>
+                    <input type="text" id="playerMlbTeam" name="playerMlbTeam" placeholder="e.g., Yankees, Dodgers">
+                </div>
+                <div class="form-group">
+                    <label for="playerNotes">Notes</label>
+                    <textarea id="playerNotes" name="playerNotes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Draft Player Modal -->
+    <div id="draftPlayerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Draft Player</h2>
+            <form id="draftPlayerForm">
+                <div class="form-group">
+                    <label>Player</label>
+                    <p id="draftPlayerName" class="player-info"></p>
+                </div>
+                <div class="form-group">
+                    <label for="fantasyOwner">Fantasy Owner/Team</label>
+                    <input type="text" id="fantasyOwner" placeholder="e.g., Yankees, Team Smith" required>
+                    <small class="form-help">Start typing owner name or select from existing</small>
+                </div>
+                <div class="form-group">
+                    <label for="draftNotes">Draft Notes (optional)</label>
+                    <textarea id="draftNotes" rows="2"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Draft Player</button>
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load environment config first -->
+    <script src="config/env.local.js"></script>
+    <!-- Load Supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load drag-and-drop library -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Load main application -->
+    <script src="script.js"></script>
