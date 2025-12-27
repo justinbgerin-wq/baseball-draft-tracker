@@ -659,5 +659,134 @@ select:focus, input[type="text"]:focus, textarea:focus {
     
     .editable:hover {
         background-color: rgba(255,255,255,0.02);
+   }
+/* ===== MOBILE OPTIMIZATIONS ===== */
+
+/* Touch-friendly buttons and controls */
+@media (max-width: 768px) {
+    /* Larger touch targets (iOS recommended minimum 44px) */
+    .btn {
+        min-height: 44px;
+        padding: 12px 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Stack controls vertically on mobile */
+    .controls {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .controls > div {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    /* Full-width form elements */
+    select, input[type="text"] {
+        height: 44px;
+        font-size: 16px;
+        width: 100%;
+    }
+    
+    /* Better table spacing */
+    #playersTable {
+        font-size: 14px;
+    }
+    
+    #playersTable th,
+    #playersTable td {
+        padding: 10px 6px;
+    }
+    
+    /* Stack table controls */
+    .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .table-controls .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Rankings filters */
+    .rankings-filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .filter-group {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .filter-group label {
+        margin-bottom: 0;
+        white-space: nowrap;
+        margin-right: 10px;
+    }
+    
+    /* Modal improvements */
+    .modal-content {
+        width: 95%;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        margin-bottom: 8px;
     }
 }
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+    
+    header h1 {
+        font-size: 20px;
+    }
+    
+    /* Rankings mobile layout */
+    .ranking-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .ranking-content .player-details {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    .ranking-number {
+        margin-right: 12px;
+        font-size: 16px;
+    }
+    
+    .ranking-handle {
+        margin-left: 12px;
+    }
+    
+    /* Hide notes column on very small screens */
+    .notes-column {
+        display: none;
+    }
+}
+
+/* ===== END MOBILE OPTIMIZATIONS ===== */
+}
+
